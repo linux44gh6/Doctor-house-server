@@ -7,7 +7,7 @@ const port=(process.env.PORT||3000)
  //middleware
 
  app.use(cors())
-
+ app.use(express.json())
 console.log(process.env.DB_PASS);
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.pnsxsk9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -21,6 +21,7 @@ const client = new MongoClient(uri, {
 });
 
 const doctorCollection=client.db('doctor-house').collection('doctors')
+const appointmentCollection=client.db('doctor-house').collection('appointment')
 
 async function run() {
   try {
@@ -28,10 +29,15 @@ async function run() {
     app.get('/',async(req,res)=>{
         res.send('Doctor server running')
     })
-     
+
     app.get('/doctor',async(req,res)=>{
         const result=await doctorCollection.find().toArray()
          res.send(result)
+    })
+
+    app.post('/appointment',async(req,res)=>{
+      const data=req.body
+      console.log(data);
     })
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");

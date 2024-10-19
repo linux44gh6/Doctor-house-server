@@ -82,6 +82,14 @@ async function run() {
         Message:I need doctor ${doctorName}
         `
       }
+      transporter.sendMail(mailOption,(error,info)=>{
+        if(error){
+          console.log(error);
+          return res.status(500).send("Error sending Email")
+        }
+        console.log(info.response);
+        res.status(200).send("Email send success")
+      })
     })
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {

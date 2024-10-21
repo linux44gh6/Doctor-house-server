@@ -16,7 +16,7 @@ const transporter=nodemailer.createTransport({
   service:"gmail",
   auth:{
     user:process.env.MAIL,
-    pass:process.env.MAIL_PSS
+    pass:process.env.MAIL_PASS
   }
 })
 
@@ -34,7 +34,7 @@ const client = new MongoClient(uri, {
 
 const doctorCollection = client.db('doctor-house').collection('doctors')
 const appointmentCollection = client.db('doctor-house').collection('appointment')
-
+const userCollection=client.db('doctor-server').collection('usersInfo')
 async function run() {
   try {
 
@@ -67,11 +67,25 @@ async function run() {
       const data = req.body
       console.log(data);
       const result = await appointmentCollection.insertOne(data)
+      res.send(result)
     })
 
+    app.post('/users',async(req,res)=>{
+      const userData=req.body
+      const existing={email:userData.email}
+      const exist=await userCollection.findOne(existing)
+      if(exist){
+        res.send('Email already exist')
+      }
+      else{
+        const result=await userCollection.insertOne(userData)
+        res.send(result)
+      }
+      console.log(userData);
+    })
+//sending the mail 
     app.post('/send_mail',async(req,res)=>{
       const {email,name,doctorName}=req.body
-      console.log(data);
       const mailOption={
         from:email,
         to:process.env.MAIL,
